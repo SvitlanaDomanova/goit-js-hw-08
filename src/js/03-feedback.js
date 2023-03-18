@@ -2,36 +2,41 @@ import '../css/03-feedback.css'
 import '../css/common.css'
 import throttle from 'lodash.throttle';
 
-const formsRef = document.querySelector('.feedback-form');
-const localStorageKey = 'feedback-form-state';
+const formEl = document.querySelector('.feedback-form');
+const localKey = "feedback-form-state";
+
 let elements = {};
-const refs = {
-form: document.querySelector('.feedback-form input'),
-textarea: document.querySelector('.feedback-form textarea'),
-};
 
-refs.form.addEventListener('submit', onFormSubmit);
-refs.textarea.addEventListener('input', onTextareaInput);
-populateTextarea();
+const inputEl = document.querySelector('.feedback-form input');
+const textareaEl = document.querySelector('.feedback-form textarea');
 
-function onFormSubmit(evt) {
-    evt.preventDefault();
+formEl.addEventListener(
+    'input',
+    throttle( event => {
+        elements[event.target.name] = event.target.value;
+        localStorage.setItem(localKey, JSON.stringify(elements));
+    }, 500)
+);
 
-    console.log('Відправляємо форму')
-    evt.currentTarget.reset();
-    
-}
-function onTextareaInput(evt) {
-    const message = evt.currentTarget.value;
-    localStorage.setItem('feedback-form-state', message);
-}
+
+formEl.addEventListener(
+    'submit',
+   event => { event.preventDefault();
+    if (inputEl.value !== '' && textareaEl.value !== '') {
+        console.log(elements);
+        localStorage.removeItem(localKey);
+        event.currentTarget.reset();
+        return;
+    }
+    allert('Please');
+    }
+);
 
 function populateTextarea() {
-    const saved = localStorage.getItem('feedback-form-state');
-
-    if (saved) {
-        console.log(saved);
-    refs.textarea.value = saved;
-
+    const saveData = localStorage.getItem('feedback-form-state');
+    if (saveData) {
+  elements = JSON.parse(saveData);
+  inputEl.value = elements.email || '';
+  textareaEl.value = elements.message || '';
     }
 }
