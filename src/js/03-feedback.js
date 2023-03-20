@@ -31,7 +31,7 @@ formEl.addEventListener(
         event.currentTarget.reset();
         return;
     }
-    allert('Please');
+    allert('Please fill in all fields');
     }
 );
 
